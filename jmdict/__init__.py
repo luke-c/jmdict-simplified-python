@@ -1,2 +1,2 @@
-from .JmdictParser import parse_jmdict
-from .Tags import Tags
+from .Parser import Parser
+from .TagService import TagService
