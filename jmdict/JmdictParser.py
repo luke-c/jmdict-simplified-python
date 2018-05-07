@@ -22,7 +22,7 @@ def parse_jmdict(file: str ='Jmdict.xml') -> None:
 
     words = []
     for entry in xml_root.iter('entry'):
-        entry_id = entry.find('ent_seq').text
+        entry_id = int(entry.find('ent_seq').text)
 
         kanji_list = []
         for kanji in entry.findall('k_ele'):
@@ -32,7 +32,18 @@ def parse_jmdict(file: str ='Jmdict.xml') -> None:
         for kana in entry.findall('r_ele'):
             kana_list.append(__parse_kana(kana))
 
-        full_entry = {'id': entry_id, 'kanji': kanji_list, 'kana': kana_list}
+        last_part_of_speech = []
+        sense_list = []
+        for sense in entry.findall('sense'):
+            part_of_speech = sense.findall('pos')
+            if len(part_of_speech):
+                last_part_of_speech = []
+                for item in part_of_speech:
+                    last_part_of_speech.append(item.text)
+
+            sense_list.append((__parse_sense(sense, last_part_of_speech)))
+
+        full_entry = {'id': entry_id, 'kanji': kanji_list, 'kana': kana_list, 'sense': sense_list}
         words.append(full_entry)
         entries_processed += 1
 
@@ -91,3 +102,18 @@ def __parse_kana(kana: Element) -> dict:
 
     kana_entry = {'text': text, 'common': common, 'tags': tags, 'appliesToKanji': applies_to_kanji}
     return kana_entry
+
+
+def __parse_sense(sense: Element, last_part_of_speech: list) -> dict:
+    part_of_speech = sense.findall('pos')
+
+    # If there are no pos entries for the current sense element, use the previous one
+    pos = []
+    if len(part_of_speech):
+        for item in part_of_speech:
+            pos.append(item.text)
+    else:
+        pos = last_part_of_speech
+
+    sense_entry = {'partOfSpeech': pos}
+    return sense_entry
