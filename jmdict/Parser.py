@@ -3,7 +3,7 @@ from xml.etree import ElementTree
 import json
 import time
 
-from jmdict import TagService
+from jmdict.tags import convert_tag
 
 
 def timeit(func):
@@ -19,8 +19,7 @@ def timeit(func):
 
 class Parser:
 
-    def __init__(self, tag_service: TagService, file: str = 'Jmdict.xml') -> None:
-        self.tag_service = tag_service
+    def __init__(self, file: str = 'Jmdict.xml') -> None:
         self.entries_processed = 0
 
         tree = ElementTree.parse(file)
@@ -47,7 +46,7 @@ class Parser:
                 if len(part_of_speech):
                     last_part_of_speech = []
                     for item in part_of_speech:
-                        short_pos = self.tag_service.convert_tag(item.text)
+                        short_pos = convert_tag(item.text)
                         last_part_of_speech.append(short_pos)
 
                 sense_list.append((self.__parse_sense(sense, last_part_of_speech)))
@@ -78,7 +77,7 @@ class Parser:
 
         tags = []
         for info in kanji.findall('ke_inf'):
-            short_tag = self.tag_service.convert_tag(info.text)
+            short_tag = convert_tag(info.text)
             tags.append(short_tag)
 
         kanji_entry = {'text': text, 'common': common, 'tags': tags}
@@ -96,7 +95,7 @@ class Parser:
 
         tags = []
         for info in kana.findall('re_inf'):
-            short_tag = self.tag_service.convert_tag(info.text)
+            short_tag = convert_tag(info.text)
             tags.append(short_tag)
 
         no_kanji = kana.find('re_nokanji')
@@ -119,7 +118,7 @@ class Parser:
         pos = []
         if len(part_of_speech):
             for item in part_of_speech:
-                short_pos = self.tag_service.convert_tag(item.text)
+                short_pos = convert_tag(item.text)
                 pos.append(short_pos)
         else:
             pos = last_part_of_speech

@@ -1,9 +1,8 @@
-from jmdict import Parser, TagService
+from jmdict import Parser
 
 
 def main() -> None:
-    tag_service = TagService()
-    parser = Parser(tag_service)
+    parser = Parser()
 
     parser.parse_jmdict()
 
