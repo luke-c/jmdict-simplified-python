@@ -139,10 +139,15 @@ def __parse_sense(sense: Element, last_part_of_speech: list) -> dict:
     else:
         applies_to_kana = ['*']
 
+    field = []
+    for item in sense.findall('field'):
+        field.append(convert_tag(item.text))
+
     sense_entry = {
         'partOfSpeech': pos,
         'appliesToKanji': applies_to_kanji,
-        'appliesToKana': applies_to_kana
+        'appliesToKana': applies_to_kana,
+        'field': field
     }
 
     return sense_entry
