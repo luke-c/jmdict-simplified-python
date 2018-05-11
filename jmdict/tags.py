@@ -1,3 +1,4 @@
+# TODO: Generate these instead of hard-coding them
 tags = {
     "martial arts term": "MA",
     "rude or X-rated term (not displayed in educational software)": "X",

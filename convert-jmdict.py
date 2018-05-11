@@ -1,10 +1,8 @@
-from jmdict import Parser
+from jmdict import parse_jmdict
 
 
 def main() -> None:
-    parser = Parser()
-
-    parser.parse_jmdict()
+    parse_jmdict()
 
 
 if __name__ == '__main__': main()
