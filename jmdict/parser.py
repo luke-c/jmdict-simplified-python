@@ -143,11 +143,30 @@ def __parse_sense(sense: Element, last_part_of_speech: list) -> dict:
     for item in sense.findall('field'):
         field.append(convert_tag(item.text))
 
+    dialect = []
+    for item in sense.findall('dial'):
+        dialect.append(convert_tag(item.text))
+
+    misc = []
+    for item in sense.findall('misc'):
+        misc.append(convert_tag(item.text))
+
+    info = []
+    for item in sense.findall('info'):
+        info.append(item.text)
+
+    language_source = []
+    for item in sense.findall('lsource'):
+        language_source.append(item.text)
+
     sense_entry = {
         'partOfSpeech': pos,
         'appliesToKanji': applies_to_kanji,
         'appliesToKana': applies_to_kana,
-        'field': field
+        'field': field,
+        'dialect': dialect,
+        'misc': misc,
+        'info': info
     }
 
     return sense_entry
