@@ -157,7 +157,22 @@ def __parse_sense(sense: Element, last_part_of_speech: list) -> dict:
 
     language_source = []
     for item in sense.findall('lsource'):
-        language_source.append(item.text)
+        lang = item.get('{http://www.w3.org/XML/1998/namespace}lang', 'eng')
+
+        wasei = item.get('ls_wasei', 'n')
+        is_wasei = True if wasei == 'y' else False
+
+        type = item.get('ls_type', 'full')
+        is_full = True if type == 'full' else False
+
+        language_source_entry = {
+            'lang': lang,
+            'full': is_full,
+            'wasei': is_wasei,
+            'text': item.text
+        }
+
+        language_source.append(language_source_entry)
 
     sense_entry = {
         'partOfSpeech': pos,
