@@ -155,6 +155,7 @@ def __parse_sense(sense: Element, last_part_of_speech: list) -> dict:
     for item in sense.findall('info'):
         info.append(item.text)
 
+    # TODO: Find out if there is ever more than 1 for each sense
     language_source = []
     for item in sense.findall('lsource'):
         lang = item.get('{http://www.w3.org/XML/1998/namespace}lang', 'eng')
@@ -174,6 +175,19 @@ def __parse_sense(sense: Element, last_part_of_speech: list) -> dict:
 
         language_source.append(language_source_entry)
 
+    gloss = []
+    for item in sense.findall('gloss'):
+        lang = item.get('{http://www.w3.org/XML/1998/namespace}lang', 'eng')
+        g_type = item.get('g_type', None)
+
+        gloss_entry = {
+            'lang': lang,
+            'type': g_type,
+            'text': item.text
+        }
+
+        gloss.append(gloss_entry)
+
     sense_entry = {
         'partOfSpeech': pos,
         'appliesToKanji': applies_to_kanji,
@@ -185,7 +199,7 @@ def __parse_sense(sense: Element, last_part_of_speech: list) -> dict:
         'misc': misc,
         'info': info,
         'languageSource': language_source,
-        'gloss': None
+        'gloss': gloss
     }
 
     return sense_entry
