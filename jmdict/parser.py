@@ -159,11 +159,11 @@ def __parse_sense(sense: Element, last_part_of_speech: list) -> dict:
     for item in sense.findall('lsource'):
         lang = item.get('{http://www.w3.org/XML/1998/namespace}lang', 'eng')
 
-        wasei = item.get('ls_wasei', 'n')
-        is_wasei = True if wasei == 'y' else False
+        ls_wasei = item.get('ls_wasei', 'n')
+        is_wasei = True if ls_wasei == 'y' else False
 
-        type = item.get('ls_type', 'full')
-        is_full = True if type == 'full' else False
+        ls_type = item.get('ls_type', 'full')
+        is_full = True if ls_type == 'full' else False
 
         language_source_entry = {
             'lang': lang,
@@ -178,10 +178,14 @@ def __parse_sense(sense: Element, last_part_of_speech: list) -> dict:
         'partOfSpeech': pos,
         'appliesToKanji': applies_to_kanji,
         'appliesToKana': applies_to_kana,
+        'related': None,
+        'antonym': None,
         'field': field,
         'dialect': dialect,
         'misc': misc,
-        'info': info
+        'info': info,
+        'languageSource': language_source,
+        'gloss': None
     }
 
     return sense_entry
