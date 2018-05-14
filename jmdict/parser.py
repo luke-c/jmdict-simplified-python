@@ -139,6 +139,14 @@ def __parse_sense(sense: Element, last_part_of_speech: list) -> dict:
     else:
         applies_to_kana = ['*']
 
+    related = []
+    for item in sense.findall('xref'):
+        related.append(__transform_xref(item.text))
+
+    antonym = []
+    for item in sense.findall('ant'):
+        antonym.append(__transform_xref(item.text))
+
     field = []
     for item in sense.findall('field'):
         field.append(convert_tag(item.text))
@@ -192,8 +200,8 @@ def __parse_sense(sense: Element, last_part_of_speech: list) -> dict:
         'partOfSpeech': pos,
         'appliesToKanji': applies_to_kanji,
         'appliesToKana': applies_to_kana,
-        'related': None,
-        'antonym': None,
+        'related': related,
+        'antonym': antonym,
         'field': field,
         'dialect': dialect,
         'misc': misc,
@@ -202,4 +210,32 @@ def __parse_sense(sense: Element, last_part_of_speech: list) -> dict:
         'gloss': gloss
     }
 
-    return sense_entry
+
+def __transform_part_of_speech(part_of_speech: Element) -> list:
+    pos = []
+    for item in part_of_speech:
+        pos.append(convert_tag(item.text))
+
+    return pos
+
+
+def __is_common(priorities: Element) -> bool:
+    for item in priorities:
+        if item.text in ["news1", "ichi1", "spec1", "spec2", "gai1"]:
+            return True
+    else:
+        return False
+
+
+# TODO: Return a dict or kanji, kana, number
+def __transform_xref(xref: str) -> list:
+    xref_item = []
+    split_xref = xref.split('・')
+
+    for part in split_xref:
+        try:
+            xref_item.append(int(part))
+        except ValueError:
+            xref_item.append(part)
+
+    return xref_item
