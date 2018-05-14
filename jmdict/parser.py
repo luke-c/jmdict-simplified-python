@@ -26,35 +26,38 @@ def parse_jmdict(file: str = 'Jmdict.xml') -> None:
 
     words = []
     for entry in root.iter('entry'):
-        entry_id = int(entry.find('ent_seq').text)
-
-        kanji_list = []
-        for kanji in entry.findall('k_ele'):
-            kanji_list.append(__parse_kanji(kanji))
-
-        kana_list = []
-        for kana in entry.findall('r_ele'):
-            kana_list.append(__parse_kana(kana))
-
-        last_part_of_speech = []
-        sense_list = []
-        for sense in entry.findall('sense'):
-            part_of_speech = sense.findall('pos')
-            if len(part_of_speech):
-                last_part_of_speech = []
-                for item in part_of_speech:
-                    short_pos = convert_tag(item.text)
-                    last_part_of_speech.append(short_pos)
-
-            sense_list.append((__parse_sense(sense, last_part_of_speech)))
-
-        full_entry = {'id': entry_id, 'kanji': kanji_list, 'kana': kana_list, 'sense': sense_list}
-        words.append(full_entry)
+        words.append(__parse_entry(entry))
         entries_processed += 1
 
     __write_to_json(words)
 
     print(f'Entries processed: {entries_processed}')
+
+
+def __parse_entry(entry: Element) -> dict:
+    entry_id = int(entry.find('ent_seq').text)
+
+    kanji_list = []
+    for kanji in entry.findall('k_ele'):
+        kanji_list.append(__parse_kanji(kanji))
+
+    kana_list = []
+    for kana in entry.findall('r_ele'):
+        kana_list.append(__parse_kana(kana))
+
+    last_part_of_speech = []
+    sense_list = []
+    for sense in entry.findall('sense'):
+        part_of_speech = sense.findall('pos')
+        if len(part_of_speech):
+            last_part_of_speech = []
+            for item in part_of_speech:
+                short_pos = convert_tag(item.text)
+                last_part_of_speech.append(short_pos)
+
+        sense_list.append((__parse_sense(sense, last_part_of_speech)))
+
+    return {'id': entry_id, 'kanji': kanji_list, 'kana': kana_list, 'sense': sense_list}
 
 
 def __write_to_json(words: list) -> None:
@@ -66,36 +69,25 @@ def __write_to_json(words: list) -> None:
 def __parse_kanji(kanji: Element) -> dict:
     text = kanji.find('keb').text
 
-    for priority in kanji.findall('ke_pri'):
-        if priority.text in ["news1", "ichi1", "spec1", "spec2", "gai1"]:
-            common = True
-            break
-    else:
-        common = False
+    priorities = kanji.findall('ke_pri')
+    is_common = __is_common(priorities)
 
     tags = []
     for info in kanji.findall('ke_inf'):
-        short_tag = convert_tag(info.text)
-        tags.append(short_tag)
+        tags.append(convert_tag(info.text))
 
-    kanji_entry = {'text': text, 'common': common, 'tags': tags}
-    return kanji_entry
+    return {'text': text, 'common': is_common, 'tags': tags}
 
 
 def __parse_kana(kana: Element) -> dict:
     text = kana.find('reb').text
 
-    for priority in kana.findall('re_pri'):
-        if priority.text in ["news1", "ichi1", "spec1", "spec2", "gai1"]:
-            common = True
-            break
-    else:
-        common = False
+    priorities = kana.findall('re_pri')
+    is_common = __is_common(priorities)
 
     tags = []
     for info in kana.findall('re_inf'):
-        short_tag = convert_tag(info.text)
-        tags.append(short_tag)
+        tags.append(convert_tag(info.text))
 
     no_kanji = kana.find('re_nokanji')
 
@@ -107,20 +99,16 @@ def __parse_kana(kana: Element) -> dict:
         if not len(applies_to_kanji):
             applies_to_kanji = ['*']
 
-    kana_entry = {'text': text, 'common': common, 'tags': tags, 'appliesToKanji': applies_to_kanji}
-    return kana_entry
+    return {'text': text, 'common': is_common, 'tags': tags, 'appliesToKanji': applies_to_kanji}
 
 
 def __parse_sense(sense: Element, last_part_of_speech: list) -> dict:
     part_of_speech = sense.findall('pos')
 
-    # If there are no pos entries for the current sense element, use the previous one
-    pos = []
     if len(part_of_speech):
-        for item in part_of_speech:
-            short_pos = convert_tag(item.text)
-            pos.append(short_pos)
+        pos = __transform_part_of_speech(part_of_speech)
     else:
+        # If there are no pos entries for the current sense element, use the previous one
         pos = last_part_of_speech
 
     applies_to_kanji_search = sense.findall('stagk')
@@ -163,7 +151,6 @@ def __parse_sense(sense: Element, last_part_of_speech: list) -> dict:
     for item in sense.findall('info'):
         info.append(item.text)
 
-    # TODO: Find out if there is ever more than 1 for each sense
     language_source = []
     for item in sense.findall('lsource'):
         lang = item.get('{http://www.w3.org/XML/1998/namespace}lang', 'eng')
@@ -196,7 +183,7 @@ def __parse_sense(sense: Element, last_part_of_speech: list) -> dict:
 
         gloss.append(gloss_entry)
 
-    sense_entry = {
+    return {
         'partOfSpeech': pos,
         'appliesToKanji': applies_to_kanji,
         'appliesToKana': applies_to_kana,
