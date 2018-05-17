@@ -1,12 +1,5 @@
-HIRAGANA_START = 0x3041
-HIRAGANA_END = 0x3096
-KATAKANA_START = 0x30a1
-KATAKANA_END = 0x30fc
-
-PROLONGED_SOUND_MARK = 0x30fc
-
-KANJI_START = 0x4e00
-KANJI_END = 0x9faf
+from utils.constants import HIRAGANA_START, HIRAGANA_END, KATAKANA_START, KATAKANA_END, KANJI_START, KANJI_END, \
+    PROLONGED_SOUND_MARK
 
 
 def is_kana(text: str) -> bool:
@@ -84,10 +77,3 @@ def is_char_in_range(char: str, start: int, end: int) -> bool:
 def is_char_long_dash(char: str = ''):
     code: int = ord(char)
     return code == PROLONGED_SOUND_MARK
-
-
-print(is_kana('々'))
-print(ord('々'))
-
-print(0xff61)
-print(0xff65)
