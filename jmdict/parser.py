@@ -4,6 +4,8 @@ import json
 import time
 
 from jmdict.tags import convert_tag
+from utils.constants import COMMON_PRIORITIES
+from utils.japanese import any_kanji, any_kana
 
 
 def timeit(func):
@@ -208,21 +210,60 @@ def __transform_part_of_speech(part_of_speech: Element) -> list:
 
 def __is_common(priorities: Element) -> bool:
     for item in priorities:
-        if item.text in ["news1", "ichi1", "spec1", "spec2", "gai1"]:
+        if item.text in COMMON_PRIORITIES:
             return True
     else:
         return False
 
 
-# TODO: Return a dict or kanji, kana, number
-def __transform_xref(xref: str) -> list:
-    xref_item = []
+def __transform_xref(xref: str) -> dict:
     split_xref = xref.split('・')
 
-    for part in split_xref:
-        try:
-            xref_item.append(int(part))
-        except ValueError:
-            xref_item.append(part)
+    if len(split_xref) == 3:
+        (kanji, kana, sense_index) = split_xref
+        return __build_xref(kanji=kanji, kana=kana, sense_index=int(sense_index))
 
-    return xref_item
+    if len(split_xref) == 1:
+        first = split_xref[0]
+        contains_kanji = any_kanji(first)
+        contains_kana = any_kana(first)
+
+        if contains_kanji:
+            return __build_xref(kanji=first)
+
+        if contains_kana:
+            return __build_xref(kana=first)
+
+        # Default to Kanji if we are not sure
+        return __build_xref(kanji=first)
+
+    if len(split_xref) == 2:
+        (first, second) = split_xref
+        first_contains_kanji = any_kanji(first)
+        first_contains_kana = any_kana(first)
+
+        if second.isdigit():
+            second = int(second)
+
+            if first_contains_kanji:
+                return __build_xref(kanji=first, sense_index=second)
+
+            if first_contains_kana:
+                return __build_xref(kana=first, sense_index=second)
+
+            # Default to Kanji if we are nto sure
+            return __build_xref(kanji=first, sense_index=second)
+
+        return __build_xref(kanji=first, kana=second)
+
+    # Return a xref with all null values if the xref was malformed
+    print(f'Something went wrong parsing xref: {split_xref}')
+    return __build_xref()
+
+
+def __build_xref(kanji: str = None, kana: str = None, sense_index: int = None):
+    return {
+        'kanji': kanji,
+        'kana': kana,
+        'senseIndex': sense_index
+    }
