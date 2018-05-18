@@ -23,7 +23,7 @@ There are some minor changes compared to jmdict-simplified, namely around the xr
       - `kana` (string) := The kana reb element this sense applies to 
       - `senseIndex` (int) := The index of a sense, counting from 1
 
-    Examples: `["丸", "まる", 1]`, `["○", "まる", 1]`, `["二重丸", "にじゅうまる"]`, `["漢数字"]`, etc.
+    Examples: `{'kanji': "丸", 'kana': "まる", 'senseIndex': 1}`, `{'kanji': "○", 'kana': "まる", 'senseIndex': 1}`, `{'kanji': "二重丸", 'kana': "にじゅうまる", 'senseIndex': null}`, `{'kanji': "漢数字", 'kana': null, 'senseIndex': null}`, etc.
 
 - `tag` (string) := all tags are listed in a separate section of the file, see the description of root JSON object
 
