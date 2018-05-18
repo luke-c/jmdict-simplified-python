@@ -17,7 +17,7 @@ There are some minor changes compared to jmdict-simplified, namely around the xr
 
 ### Custom types
 
-- `xref` (dictionary of kanji/strings) := one of the following structures:
+- `xref` (array of objects) := has the following structures:
 
       - `kanji` (string) := The kanji keb element this sense applies to
       - `kana` (string) := The kana reb element this sense applies to 
