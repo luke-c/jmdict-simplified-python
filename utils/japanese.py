@@ -1,5 +1,12 @@
-from utils.constants import HIRAGANA_START, HIRAGANA_END, KATAKANA_START, KATAKANA_END, KANJI_START, KANJI_END, \
-    PROLONGED_SOUND_MARK
+from utils.constants import (
+    HIRAGANA_START,
+    HIRAGANA_END,
+    KATAKANA_START,
+    KATAKANA_END,
+    KANJI_START,
+    KANJI_END,
+    PROLONGED_SOUND_MARK,
+)
 
 
 def is_kana(text: str) -> bool:
@@ -74,6 +81,6 @@ def is_char_in_range(char: str, start: int, end: int) -> bool:
     return start <= code <= end
 
 
-def is_char_long_dash(char: str = ''):
+def is_char_long_dash(char: str = ""):
     code: int = ord(char)
     return code == PROLONGED_SOUND_MARK

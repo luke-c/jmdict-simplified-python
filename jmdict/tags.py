@@ -172,7 +172,7 @@ tags = {
     "sumo term": "sumo",
     "zoology term": "zool",
     "jocular, humorous term": "joc",
-    "anatomical term": "anat"
+    "anatomical term": "anat",
 }
 
 

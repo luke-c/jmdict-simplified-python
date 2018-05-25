@@ -6,4 +6,5 @@ def main() -> None:
     parse_jmdict()
 
 
-if __name__ == '__main__': main()
+if __name__ == "__main__":
+    main()
