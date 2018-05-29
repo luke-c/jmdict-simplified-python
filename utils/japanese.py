@@ -6,6 +6,8 @@ from utils.constants import (
     KANJI_START,
     KANJI_END,
     PROLONGED_SOUND_MARK,
+    JAPANESE_RANGES,
+    ROMAJI_RANGES,
 )
 
 
@@ -51,6 +53,37 @@ def any_kanji(text: str) -> bool:
     return any(is_char_kanji(char) for char in text)
 
 
+def is_japanese(text: str) -> bool:
+    if not text:
+        return False
+
+    return all(is_char_japanese(char) for char in text)
+
+
+def is_romaji(text: str) -> bool:
+    if not text:
+        return False
+
+    return all(is_char_romaji(char) for char in text)
+
+
+def is_mixed(text: str, pass_kanji=True) -> bool:
+    has_kanji = False
+
+    if not pass_kanji:
+        has_kanji = any(is_kanji(char) for char in text)
+
+    is_hiragana_or_katakana = any(is_hiragana(char) for char in text) or any(
+        is_katakana(char) for char in text
+    )
+
+    return (
+        is_hiragana_or_katakana
+        and any(is_romaji(char) for char in text)
+        and not has_kanji
+    )
+
+
 def is_char_kana(char: str) -> bool:
     if not char:
         return False
@@ -74,6 +107,14 @@ def is_char_katakana(char: str) -> bool:
 
 def is_char_kanji(char: str) -> bool:
     return is_char_in_range(char, KANJI_START, KANJI_END)
+
+
+def is_char_japanese(char: str) -> bool:
+    return any(is_char_in_range(char, start, end) for (start, end) in JAPANESE_RANGES)
+
+
+def is_char_romaji(char: str) -> bool:
+    return any(is_char_in_range(char, start, end) for (start, end) in ROMAJI_RANGES)
 
 
 def is_char_in_range(char: str, start: int, end: int) -> bool:
